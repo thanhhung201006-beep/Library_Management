@@ -1,76 +1,122 @@
-from data import books, borrows, fines # Đưa tất cả các bảng dữ liệu lên đầu file
+from data import books, borrows, CURRENT_DAY, FINE_PER_DAY
 
 def member_menu(user):
     while True:
-        print(f"\n--- MENU THANH VIEN: {user['username'].upper()} ---") # Hiển thị tên user cho chuyên nghiệp
+        print("\n--- MEMBER MENU ---")
         print("1. Xem danh sach sach")
-        print("2. Dang ky muon sach")
+        print("2. Muon sach")
         print("3. Tra sach")
-        print("4. Gia han sach")
-        print("5. Lich su muon")
-        print("6. Danh sach tien phat")
+        print("4. Xem lich su muon")
+        print("5. Xem tien phat")
         print("0. Dang xuat")
-        c = input("Chon chuc nang: ") # Sử dụng biến 'c' đơn giản theo phong cách của bạn
 
-        if c == "1":
-            # Hiển thị danh sách sách kèm trạng thái hiện tại
+        choice = input("Chon: ")
+
+        if not choice.isdigit():
+            print("Lua chon khong hop le!")
+            continue
+
+        if choice == "1":
             for b in books:
-                print(f"ID: {b['id']} - {b['title']} | Trang thai: {b['status']}")
+                print(b)
 
-        elif c == "2":
-            bid = int(input("Nhap ID sach muon: "))
-            for b in books:
-                # Chỉ cho phép mượn nếu sách đang ở trạng thái 'available'
-                if b["id"] == bid:
-                    if b["status"] == "available":
-                        b["status"] = "pending" # Chuyển sang chờ duyệt để Thu thư xử lý
-                        borrows.append({
-                            "user": user["username"], 
-                            "book_id": bid, 
-                            "due": 7, 
-                            "status": "Cho duyet"
-                        })
-                        print("Yeu cau muon da gui den Thu thu!")
-                    else:
-                        print("Sach hien khong co san de muon.")
-                    break
+        elif choice == "2":
+            borrow_book(user)
 
-        elif c == "3":
-            bid = int(input("Nhap ID sach muon tra: "))
-            found = False
-            for br in borrows:
-                # Chỉ cho trả những sách đã được duyệt mượn
-                if br["user"] == user["username"] and br["book_id"] == bid and br["status"] == "Da duyet":
-                    br["status"] = "Da tra"
-                    # Cập nhật lại kho sách để người khác có thể mượn
-                    for b in books:
-                        if b["id"] == bid:
-                            b["status"] = "available"
-                    print("Tra sach thanh cong!")
-                    found = True
-                    break
-            if not found:
-                print("Khong tim thay giao dich mượn phù hợp để trả.")
+        elif choice == "3":
+            return_book(user)
 
-        elif c == "4":
-            bid = int(input("Nhap ID sach muon gia han: "))
-            for br in borrows:
-                if br["user"] == user["username"] and br["book_id"] == bid and br["status"] == "Da duyet":
-                    br["due"] += 3 # Tăng thời gian mượn thêm 3 ngày
-                    print("Gia han thanh cong them 3 ngay!")
-                    break
+        elif choice == "4":
+            view_history(user)
 
-        elif c == "5":
-            print("--- LICH SU GIAO DICH ---")
-            for br in borrows:
-                if br["user"] == user["username"]:
-                    print(f"Sach ID: {br['book_id']} | Ngay thue: {br['due']} ngay | Trang thai: {br['status']}")
+        elif choice == "5":
+            view_fine(user)
 
-        elif c == "6":
-            print("--- DANH SACH TIEN PHAT ---")
-            for f in fines:
-                if f["user"] == user["username"]:
-                    print(f"Sach ID: {f['book_id']} - So tien: {f['amount']} VND")
-
-        elif c == "0":
+        elif choice == "0":
             break
+
+        else:
+            print("Lua chon khong hop le!")
+
+def borrow_book(user):
+    bid_input = input("Nhap ID sach: ")
+
+    if not bid_input.isdigit():
+        print("ID sach phai la so!")
+        return
+
+    bid = int(bid_input)
+
+    book = None
+    for b in books:
+        if b["id"] == bid:
+            book = b
+
+    if not book:
+        print("Khong tim thay sach!")
+        return
+
+    if book["status"] != "available":
+        print("Sach da duoc muon!")
+        return
+
+    borrows.append({
+        "user": user["username"],
+        "book_id": bid,
+        "borrow_day": CURRENT_DAY,
+        "due": 7,
+        "status": "Chua tra",
+        "fine": 0
+    })
+    book["status"] = "pending"
+    print("Yeu cau muon sach da duoc gui!")
+
+def return_book(user):
+    bid_input = input("Nhap ID sach can tra: ")
+
+    if not bid_input.isdigit():
+        print("ID sach phai la so!")
+        return
+
+    bid = int(bid_input)
+
+    found = False
+    for br in borrows:
+        if br["user"] == user["username"] and br["book_id"] == bid and br["status"] == "Chua tra":
+            days_late = CURRENT_DAY - (br["borrow_day"] + br["due"])
+            if days_late > 0:
+                br["fine"] = days_late * FINE_PER_DAY
+                print(f"Ban tra tre {days_late} ngay.")
+                print(f"Tien phat: {br['fine']} VND")
+            else:
+                print("Tra dung han. Khong bi phat.")
+
+            br["status"] = "Da tra"
+            for b in books:
+                if b["id"] == bid:
+                    b["status"] = "available"
+
+            print("Tra sach thanh cong!")
+            found = True
+
+    if not found:
+        print("Ban chua muon sach nay!")
+
+def view_history(user):
+    print("\n--- LICH SU MUON ---")
+    for br in borrows:
+        if br["user"] == user["username"]:
+            print(f"Sach ID {br['book_id']} | Trang thai: {br['status']} | Tien phat: {br['fine']} VND")
+
+def view_fine(user):
+    total = 0
+    print("\n--- TIEN PHAT CUA BAN ---")
+    for br in borrows:
+        if br["user"] == user["username"] and br["fine"] > 0:
+            print(f"Sach ID {br['book_id']} - Tien phat: {br['fine']} VND")
+            total += br["fine"]
+
+    if total == 0:
+        print("Ban khong co tien phat nao.")
+    else:
+        print(f"TONG TIEN PHAT: {total} VND")

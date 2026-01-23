@@ -1,16 +1,32 @@
 from data import users
 
 def login():
-    u = input("Username: ")
-    p = input("Password: ")
-    for user in users:
-        if user["username"] == u and user["password"] == p:
-            return user
-    print("Sai tai khoan!")
+    username = input("Nhap username: ")
+    password = input("Nhap password: ")
+
+    for u in users:
+        if u["username"] == username:
+            if u["password"] == password:
+                print("Dang nhap thanh cong!")
+                return u
+            else:
+                print("Sai mat khau!")
+                return None
+
+    print("Tai khoan khong ton tai!")
     return None
 
+
 def register():
-    u = input("Nhap username: ")
-    p = input("Nhap password: ")
-    users.append({"username":u,"password":p,"role":"member"})
-    print("Dang ky thanh cong! Ban la MEMBER.")
+    print("\n--- DANG KY TAI KHOAN ---")
+    username = input("Nhap username: ")
+
+    for u in users:
+        if u["username"] == username:
+            print("Username da ton tai!")
+            return None
+
+    password = input("Nhap password: ")
+    users.append({"username": username, "password": password, "role": "member"})
+    print("Dang ky thanh cong! Ban co the dang nhap ngay.")
+    return True

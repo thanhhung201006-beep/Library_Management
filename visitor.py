@@ -1,24 +1,39 @@
-from data import books
-from auth import register
+from data import users, books
 
 def visitor_menu():
     while True:
-        print("\n--- VISITOR ---")
-        print("1. Xem sach")
-        print("2. Tim sach")
-        print("3. Dang ky")
+        print("\n--- VISITOR MENU ---")
+        print("1. Xem danh sach sach")
+        print("2. Dang ky tai khoan")
         print("0. Thoat")
-        c = input("Chon: ")
 
-        if c == "1":
+        choice = input("Chon: ")
+
+        if not choice.isdigit():
+            print("Lua chon khong hop le!")
+            continue
+
+        if choice == "1":
             for b in books:
-                print(b["id"], b["title"], "-", b["author"], "-", b["status"])
-        elif c == "2":
-            key = input("Nhap tu khoa: ").lower()
-            for b in books:
-                if key in b["title"].lower() or key in b["author"].lower():
-                    print(b["title"], "-", b["author"])
-        elif c == "3":
+                print(b)
+
+        elif choice == "2":
             register()
-        elif c == "0":
+
+        elif choice == "0":
             break
+
+        else:
+            print("Lua chon khong hop le!")
+
+def register():
+    username = input("Nhap username: ")
+
+    for u in users:
+        if u["username"] == username:
+            print("Username da ton tai!")
+            return
+
+    password = input("Nhap password: ")
+    users.append({"username": username, "password": password, "role": "member"})
+    print("Dang ky thanh cong!")

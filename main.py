@@ -6,16 +6,19 @@ from admin import admin_menu
 
 def main():
     while True:
-        print("\n=== LIBRARY MANAGEMENT SYSTEM ===")
-        print("1. Dang ky")
-        print("2. Login")
+        print("\n--- HE THONG QUAN LY THU VIEN ---")
+        print("1. Dang nhap")
+        print("2. Dang ky tai khoan")
         print("3. Visitor")
         print("0. Thoat")
-        c = input("Chon: ")
 
-        if c == "1":
-            register()
-        elif c == "2":
+        choice = input("Chon: ")
+
+        if not choice.isdigit():
+            print("Lua chon khong hop le!")
+            continue
+
+        if choice == "1":
             user = login()
             if user:
                 if user["role"] == "member":
@@ -24,9 +27,19 @@ def main():
                     librarian_menu()
                 elif user["role"] == "admin":
                     admin_menu()
-        elif c == "3":
+
+        elif choice == "2":
+            register()
+
+        elif choice == "3":
             visitor_menu()
-        elif c == "0":
+
+        elif choice == "0":
+            print("Tam biet!")
             break
 
-main()
+        else:
+            print("Lua chon khong hop le!")
+
+if __name__ == "__main__":
+    main()

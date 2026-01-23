@@ -2,18 +2,40 @@ from data import users
 
 def admin_menu():
     while True:
-        print("\n--- ADMIN ---")
-        print("1. Xem user")
+        print("\n--- ADMIN MENU ---")
+        print("1. Xem danh sach user")
         print("2. Xoa user")
-        print("0. Thoat")
-        c = input("Chon: ")
+        print("0. Dang xuat")
 
-        if c == "1":
+        choice = input("Chon: ")
+
+        if not choice.isdigit():
+            print("Lua chon khong hop le!")
+            continue
+
+        if choice == "1":
             for u in users:
-                print(u["username"], "-", u["role"])
-        elif c == "2":
-            name = input("Nhap username can xoa: ")
-            users[:] = [u for u in users if u["username"] != name]
-            print("Da xoa user!")
-        elif c == "0":
+                print(u)
+
+        elif choice == "2":
+            delete_user()
+
+        elif choice == "0":
             break
+
+        else:
+            print("Lua chon khong hop le!")
+
+def delete_user():
+    uname = input("Nhap username can xoa: ")
+
+    found = False
+    for u in users:
+        if u["username"] == uname:
+            users.remove(u)
+            print("Da xoa tai khoan!")
+            found = True
+            break
+
+    if not found:
+        print("Khong tim thay tai khoan!")
