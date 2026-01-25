@@ -1,7 +1,7 @@
 users = [
-    {"username": "admin", "password": "123", "role": "admin"},
+    {"username": "ad", "password": "123", "role": "admin"},
     {"username": "lib", "password": "123", "role": "librarian"},
-    {"username": "mem", "password": "123", "role": "member"}
+    {"username": "mem","password": "123", "role": "member"}
 ]
 
 books = [
@@ -19,3 +19,4 @@ borrows = [
 
 CURRENT_DAY = 10   # giả lập ngày hiện tại
 FINE_PER_DAY = 5000
+
